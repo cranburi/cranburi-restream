@@ -1,0 +1,32 @@
+name: cranburi-restream
+networks:
+  default-network:
+    name: default-network
+services:
+  # can be used to make proxied RTMP through local nginx server to output as HLS/DASH
+  # rtmp-proxy:
+  #   container_name: rtmp-proxy
+  #   build:
+  #     context: ./docker/rtmp-proxy
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 1935:1935
+  #   networks:
+  #     - default-network
+  # injests RTMP and re-streams as required (eg youtube, local webserver)
+  ffmpeg-proxy:
+    container_name: ffmpeg-proxy
+    # depends_on:
+    #   - rtmp-proxy
+    environment:
+      - REOLINK_RTMP_HOST
+      - REOLINK_RTMP_USERNAME
+      - REOLINK_RTMP_PASSWORD
+      - YOUTUBE_LIVE_KEY
+    build:
+      context: ./docker/ffmpeg-proxy
+      dockerfile: Dockerfile
+    volumes:
+      - ./docker/ffmpeg-proxy/scripts:/var/cranburi/scripts
+    networks:
+      - default-network
